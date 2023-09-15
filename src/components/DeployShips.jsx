@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Swal from "sweetalert2";
 
 import Axis from "./Axis";
-import Board from "./Board";
+import Board from "./DeployBoard";
 import Inventory from "./Inventory";
 import Sound from "./Sound";
 
@@ -14,12 +14,11 @@ import {
   getOccupiableBlocks,
   isPlaceTakenByOtherShip,
   getRandomOcupiableBlock,
-  generateRandomRowAndColumnIndex,
+
   getShipNameByCoordinates,
   isArraysEqual,
 } from "../utils/helper";
 import { useUser } from "./UserContext";
-import { Loader } from "@mantine/core";
 import JoinGameButton from "./JoinGameButton";
 
 const Battleship = ( { gameAddress } ) => {

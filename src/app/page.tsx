@@ -3,6 +3,7 @@ import AddressBox from "@/components/AddressBox";
 import { useUser } from "@/components/UserContext";
 import { deployGame } from "@/utils/game";
 import { ActionIcon, Loader, TextInput } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 
 export default function Home() {
@@ -14,6 +15,11 @@ export default function Home() {
     setLoading(true);
     console.log("currentUser", currentUser!.address);
     console.log("enemyAddress", enemyAddress);
+
+    notifications.show({
+      title: "Deploying contract for your game",
+      message: <div>This may take a few seconds</div>,
+    });
 
     const gameAddress = await deployGame(enemyAddress, currentUser!.privateKey);
     console.log(gameAddress);

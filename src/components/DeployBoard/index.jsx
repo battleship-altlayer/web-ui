@@ -1,6 +1,6 @@
 import React from "react";
 
-import BoardSquare from "./BoardSquare";
+import BoardSquare from "./DeployBoardSquare";
 import { BOARD_ARR, CURRENT_PLAYER, MISS_HIT } from "../../utils/DB";
 
 const Board = ({

@@ -275,7 +275,7 @@ body {
 
 /* BoardSquare starts */
 .board__square {
-  border: 1px solid #fff;
+  border: 1px solid #777;
   cursor: crosshair;
   transition: background-color 100ms ease-in-out;
 }
@@ -284,26 +284,22 @@ body {
 }
 
 .carrier {
-  background-color: #4c3a51;
+  background-color: #fff;
 }
 .battleship {
-  background-color: #774360;
+  background-color: #fff;
 }
 .cruiser {
-  background-color: #b25068;
+  background-color: #fff;
 }
 .destroyer {
-  background-color: #ff8c8c;
+  background-color: #fff;
 }
 .miss {
-  background-color: #000;
+  background-color: #707070;
 }
 .hit {
   background-color: #f03e3e;
-}
-
-.ship-sunk {
-  background-color: #6d67e4;
 }
 
 /* BoardSquare ends */

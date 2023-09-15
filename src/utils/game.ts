@@ -1,7 +1,11 @@
 import { ethers, Wallet } from "ethers";
 import { sendJsonRpc } from "./base";
 import BattleShipGameJson from "./BattleShipGame.json";
-import { Coordinate, signShipCoordinates } from "./utils";
+import {
+  Coordinate,
+  generateShipShotProof,
+  signShipCoordinates,
+} from "./utils";
 
 export const provider = new ethers.providers.JsonRpcProvider(
   "https://zero.alt.technology"
@@ -95,4 +99,138 @@ export const joinGame = async (
   });
 
   console.log("res", res);
+};
+
+export const getPlayers = async (gameAddress: string) => {
+  const battleshipContract = gameContractWithProvider(gameAddress);
+  const player1 = await battleshipContract.playersAddress(0);
+  const player2 = await battleshipContract.playersAddress(1);
+  return [player1, player2] as const;
+};
+
+export const takeAShot = async (
+  gameAddress: string,
+  rowIndex: number,
+  columnIndex: number,
+  signer: Wallet
+) => {
+  console.log(`GameAddress: ${gameAddress}`);
+
+  const battleshipContract = new ethers.Contract(
+    gameAddress,
+    BattleShipGameJson.abi,
+    signer
+  );
+
+  const encodedData = battleshipContract.interface.encodeFunctionData(
+    "takeAShot",
+    [
+      {
+        x: rowIndex,
+        y: columnIndex,
+      },
+    ]
+  );
+  const currentNonce = await provider.getTransactionCount(
+    signer.address,
+    "latest"
+  );
+  const transaction = {
+    to: battleshipContract.address,
+    data: encodedData,
+    nonce: currentNonce,
+    gasPrice: 0,
+    gasLimit: 2100000,
+  };
+  const signedTransaction = await battleshipContract.signer.signTransaction(
+    transaction
+  );
+  const encodedTransactionData = ethers.utils.hexlify(signedTransaction);
+  const res = await sendJsonRpc("https://zero.alt.technology", {
+    method: "eth_sendRawTransaction",
+    params: [encodedTransactionData],
+  });
+
+  console.log("res", res);
+};
+
+export const handleReportHits = async (
+  gameAddress: string,
+  enemyAddress: string,
+  signer: Wallet
+) => {
+  const battleshipContractWithProvider = new ethers.Contract(
+    gameAddress,
+    BattleShipGameJson.abi,
+    provider
+  );
+  const battleshipContractWithSigner = new ethers.Contract(
+    gameAddress,
+    BattleShipGameJson.abi,
+    signer
+  );
+
+  let shotReports = await generateShipShotProof(
+    signer,
+    enemyAddress,
+    battleshipContractWithProvider
+  );
+
+  const encodedData = battleshipContractWithSigner.interface.encodeFunctionData(
+    "reportHits",
+    [shotReports]
+  );
+  const currentNonce = await provider.getTransactionCount(
+    signer.address,
+    "latest"
+  );
+  const transaction = {
+    to: battleshipContractWithSigner.address,
+    data: encodedData,
+    nonce: currentNonce,
+    gasPrice: 0,
+    gasLimit: 2100000,
+  };
+  const signedTransaction =
+    await battleshipContractWithSigner.signer.signTransaction(transaction);
+  const encodedTransactionData = ethers.utils.hexlify(signedTransaction);
+  const res = await sendJsonRpc("https://zero.alt.technology", {
+    method: "eth_sendRawTransaction",
+    params: [encodedTransactionData],
+  });
+
+  console.log("[handleReportHits] tx", res);
+};
+
+export const endTurn = async (gameAddress: string, signer: Wallet) => {
+  const battleshipContract = new ethers.Contract(
+    gameAddress,
+    BattleShipGameJson.abi,
+    signer
+  );
+  const encodedData = battleshipContract.interface.encodeFunctionData(
+    "endTurn",
+    []
+  );
+  const currentNonce = await provider.getTransactionCount(
+    signer.address,
+    "latest"
+  );
+  const transaction = {
+    to: battleshipContract.address,
+    data: encodedData,
+    nonce: currentNonce,
+    gasPrice: 0,
+    gasLimit: 2100000,
+  };
+  const signedTransaction = await battleshipContract.signer.signTransaction(
+    transaction
+  );
+  const encodedTransactionData = ethers.utils.hexlify(signedTransaction);
+  const res = await sendJsonRpc("https://zero.alt.technology", {
+    method: "eth_sendRawTransaction",
+    params: [encodedTransactionData],
+  });
+
+  console.log("[endTurn] tx", res);
 };

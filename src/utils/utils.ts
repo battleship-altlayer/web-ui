@@ -8,6 +8,7 @@ export type ShipShotProof = {
 export type Coordinate = {
   x: number;
   y: number;
+  isHit?: boolean;
 };
 export type Ship = Array<Coordinate>;
 
