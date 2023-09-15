@@ -27,35 +27,32 @@ const Page: React.FunctionComponent<IPageProps> = (props) => {
   React.useEffect(() => {
     const contract = gameContractWithProvider(props.params.address);
 
-    if (contract && enemy && props.params.address && user && update) {
-      const subscribeToEvents = async () => {
-        gameContractWithProvider(props.params.address).on(
-          "LastTurnShot",
-          (args) => {
-            console.log("LastTurnShot event: ", args);
-            handleReportHits(props.params.address, enemy!, user!);
-          }
-        );
-        gameContractWithProvider(props.params.address).on(
-          "LastTurnReport",
-          (args) => {
-            console.log("LastTurnReport event: ", args);
-            if (user.address == contractOwner)
-              endTurn(props.params.address, user);
-            update().then(() => {
-              setCanShoot(true);
-            });
-          }
-        );
-      };
-
-      subscribeToEvents();
+    if (!contract || !enemy || !props.params.address || !user || !update) {
+      return;
     }
 
+    const handleLastTurnShot = (args: any) => {
+      console.log("LastTurnShot event: ", args);
+      handleReportHits(props.params.address, enemy!, user!);
+    };
+
+    const handleLastTurnReport = (args: any) => {
+      console.log("LastTurnReport event: ", args);
+      if (user.address === contractOwner) endTurn(props.params.address, user);
+      update().then(() => {
+        setCanShoot(true);
+      });
+    };
+
+    contract.off("LastTurnShot", handleLastTurnShot);
+    contract.off("LastTurnReport", handleLastTurnReport);
+
+    contract.on("LastTurnShot", handleLastTurnShot);
+    contract.on("LastTurnReport", handleLastTurnReport);
+
     return () => {
-      if (contract) {
-        contract.removeAllListeners();
-      }
+      contract.off("LastTurnShot", handleLastTurnShot);
+      contract.off("LastTurnReport", handleLastTurnReport);
     };
   }, [enemy, props.params.address, contractOwner, user, update]);
 

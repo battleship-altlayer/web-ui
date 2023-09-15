@@ -65,7 +65,7 @@ export default function Home() {
                   placeholder="0x000000000"
                   value={enemyAddress}
                   mt={12}
-                  w={500}
+                  w={350}
                   onChange={(event) =>
                     setEnemyAddress(event.currentTarget.value)
                   }

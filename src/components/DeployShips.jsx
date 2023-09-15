@@ -20,6 +20,7 @@ import {
 } from "../utils/helper";
 import { useUser } from "./UserContext";
 import JoinGameButton from "./JoinGameButton";
+import AddressBox from "./AddressBox";
 
 const Battleship = ( { gameAddress } ) => {
   const [selectedShipToPlace, setSelectedShipToPlace] = useState(null);
@@ -351,6 +352,9 @@ const Battleship = ( { gameAddress } ) => {
   };
 
   return (
+    <div className="flex flex-col items-center">
+      <p>Share this url to your enemy</p>
+      <AddressBox address={`${window.location.href}`}/>
     <div className="battleship__stage">
       <Sound
         sunkSoundRef={sunkSoundRef}
@@ -384,6 +388,7 @@ const Battleship = ( { gameAddress } ) => {
           playerDeployedShips={playerDeployedShips}
         />
       </div>
+    </div>
     </div>
   );
 };
